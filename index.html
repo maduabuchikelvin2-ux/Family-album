@@ -299,20 +299,80 @@ const app = ()=>document.getElementById('app');
 
 // ============================= DATA LAYER =============================
 
-async function createUser(name, email, password){
+async function createUser(name, email, password) {
   email = email.trim().toLowerCase();
-  const existing = await sget('users:'+email);
-  if(existing) throw new Error('An account with this email already exists.');
-  const user = { email, name, password, avatar:null, createdAt: Date.now() };
-  await sset('users:'+email, user);
-  await sset('userFamilies:'+email, []);
+
+  const {
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    updateProfile
+  } = window.firebaseFunctions;
+
+  const result = await createUserWithEmailAndPassword(
+    window.firebaseAuth,
+    email,
+    password
+  );
+
+  await updateProfile(result.user, {
+    displayName: name
+  });
+
+  await sendEmailVerification(result.user);
+
+  const user = {
+    uid: result.user.uid,
+    email: result.user.email,
+    name: name,
+    avatar: null,
+    createdAt: Date.now()
+  };
+
+  await window.firebaseFunctions.setDoc(
+    window.firebaseFunctions.doc(
+      window.firebaseDb,
+      "users",
+      result.user.uid
+    ),
+    user
+  );
+
   return user;
 }
-async function loginUser(email, password){
+
+
+async function loginUser(email, password) {
   email = email.trim().toLowerCase();
-  const user = await sget('users:'+email);
-  if(!user || user.password !== password) throw new Error('Incorrect email or password.');
-  return user;
+
+  const { signInWithEmailAndPassword, doc, getDoc } =
+    window.firebaseFunctions;
+
+  const result = await signInWithEmailAndPassword(
+    window.firebaseAuth,
+    email,
+    password
+  );
+
+  if (!result.user.emailVerified) {
+    throw new Error(
+      "Please verify your email before logging in. Check your inbox."
+    );
+  }
+
+  const userDoc = await getDoc(
+    doc(window.firebaseDb, "users", result.user.uid)
+  );
+
+  if (userDoc.exists()) {
+    return userDoc.data();
+  }
+
+  return {
+    uid: result.user.uid,
+    email: result.user.email,
+    name: result.user.displayName || "Family Member",
+    avatar: null
+  };
 }
 
 async function getUserFamilies(email){

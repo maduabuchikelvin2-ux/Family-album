@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Album</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF5EE;
+    --paper:#FFFDF9;
+    --ink:#2B241F;
+    --ink-soft:#6B5F55;
+    --line:#E7DDD0;
+    --brick:#95483A;
+    --brick-dark:#7A3A2F;
+    --sage:#7C8A6A;
+    --sage-soft:#EEF1E7;
+    --gold:#C79A4B;
+    --danger:#B4433A;
+    --radius:14px;
+    --radius-sm:8px;
+    --shadow:0 4px 20px rgba(43,36,31,0.08);
+    --shadow-lg:0 12px 40px rgba(43,36,31,0.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces',serif;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  img{max-width:100%;display:block;}
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  ::selection{background:var(--gold);color:#fff;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:999px;border:1px solid transparent;
+    font-weight:600;font-size:14.5px;transition:all .15s ease;white-space:nowrap;
+  }
+  .btn-primary{background:var(--brick);color:#fff;}
+  .btn-primary:hover{background:var(--brick-dark);transform:translateY(-1px);}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--ink-soft);}
+  .btn-sage{background:var(--sage);color:#fff;}
+  .btn-sage:hover{background:#6b7a5a;}
+  .btn-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+  .btn-danger:hover{background:var(--danger);color:#fff;}
+  .btn-sm{padding:7px 14px;font-size:13px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-block{width:100%;}
+
+  /* ---------- Inputs ---------- */
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:14px 0 6px;}
+  label:first-child{margin-top:0;}
+  input,textarea,select{
+    width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+    background:var(--paper);font-family:inherit;font-size:14.5px;color:var(--ink);
+  }
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--brick);}
+  textarea{resize:vertical;min-height:80px;}
+  .field-row{display:flex;gap:12px;}
+  .field-row>div{flex:1;}
+  .hint{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+
+  /* ---------- Layout shells ---------- */
+  .container{max-width:1120px;margin:0 auto;padding:0 24px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);}
+  .center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px;}
+  .auth-card{width:100%;max-width:420px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em;}
+  .badge-guest{background:var(--sage-soft);color:var(--sage);}
+  .badge-admin{background:#F3E6D8;color:var(--gold);}
+  .badge-primary{background:#F1DEDA;color:var(--brick);}
+  .badge-pending{background:#EFEFEF;color:var(--ink-soft);}
+
+  /* ---------- Top nav ---------- */
+  .topnav{position:sticky;top:0;z-index:40;background:rgba(250,245,238,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .topnav-inner{display:flex;align-items:center;justify-content:space-between;height:66px;}
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Fraunces',serif;font-weight:600;font-size:20px;}
+  .brand .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brick),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+  .nav-links{display:flex;gap:4px;align-items:center;}
+  .nav-link{padding:9px 14px;border-radius:999px;font-size:14px;font-weight:600;color:var(--ink-soft);}
+  .nav-link.active,.nav-link:hover{background:#fff;color:var(--ink);}
+  .nav-right{display:flex;align-items:center;gap:10px;}
+  .icon-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--brick);border:1.5px solid var(--cream);}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .avatar-sm{width:26px;height:26px;font-size:11px;}
+  .avatar-lg{width:64px;height:64px;font-size:22px;}
+
+  /* mobile bottom nav */
+  .bottomnav{display:none;}
+  @media (max-width:760px){
+    .nav-links{display:none;}
+    .bottomnav{
+      display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--paper);
+      border-top:1px solid var(--line);z-index:40;justify-content:space-around;align-items:center;
+    }
+    .bottomnav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--ink-soft);font-weight:600;}
+    .bottomnav a.active{color:var(--brick);}
+    .bottomnav .bicon{font-size:19px;}
+    body{padding-bottom:64px;}
+    .fab-upload{position:fixed;bottom:78px;right:18px;width:54px;height:54px;border-radius:50%;background:var(--brick);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:var(--shadow-lg);z-index:41;border:none;}
+  }
+
+  /* ---------- Landing ---------- */
+  .hero{padding:90px 24px 70px;text-align:center;background:
+    radial-gradient(ellipse at 20% -10%, #F1DEDA 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 0%, #E4E9DA 0%, transparent 50%);}
+  .hero h1{font-size:clamp(34px,5.5vw,60px);font-weight:600;line-height:1.08;margin:0 0 20px;letter-spacing:-.01em;}
+  .hero .accent{font-style:italic;color:var(--brick);}
+  .hero p{max-width:560px;margin:0 auto 32px;color:var(--ink-soft);font-size:17px;line-height:1.6;}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .landing-strip{display:flex;gap:10px;justify-content:center;margin-top:56px;flex-wrap:wrap;}
+  .strip-photo{width:150px;height:190px;border-radius:12px;object-fit:cover;box-shadow:var(--shadow);transform:rotate(var(--r,0deg));}
+  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;padding:70px 0;}
+  .feature{padding:26px;border-radius:var(--radius);background:var(--paper);border:1px solid var(--line);}
+  .feature .fico{width:42px;height:42px;border-radius:10px;background:var(--sage-soft);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+  .feature h3{margin:0 0 8px;font-size:17px;}
+  .feature p{margin:0;color:var(--ink-soft);font-size:14.5px;line-height:1.55;}
+  footer.site-footer{text-align:center;padding:36px;color:var(--ink-soft);font-size:13px;border-top:1px solid var(--line);margin-top:40px;}
+
+  /* ---------- Dashboard ---------- */
+  .page{padding:32px 0 60px;}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:28px;}
+  .greet{color:var(--ink-soft);font-size:14px;margin:0 0 4px;}
+  .page-head h1{margin:0;font-size:28px;}
+  .quick-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .section-title{display:flex;justify-content:space-between;align-items:center;margin:36px 0 16px;}
+  .section-title h2{font-size:19px;margin:0;}
+  .see-all{font-size:13px;font-weight:700;color:var(--brick);}
+
+  .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .media-tile{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--line);cursor:pointer;}
+  .media-tile img,.media-tile video{width:100%;height:100%;object-fit:cover;}
+  .media-tile .vtag{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:2px 6px;border-radius:5px;}
+  .empty{text-align:center;padding:50px 20px;border:1.5px dashed var(--line);border-radius:var(--radius);color:var(--ink-soft);}
+  .empty h3{color:var(--ink);margin:10px 0 6px;font-size:17px;}
+
+  .album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;}
+  .album-card{border-radius:var(--radius);overflow:hidden;background:var(--paper);border:1px solid var(--line);cursor:pointer;transition:transform .15s;}
+  .album-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .album-cover{aspect-ratio:4/3;background:var(--sage-soft) linear-gradient(160deg,#EFE7DA,#E4E9DA);display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--ink-soft);}
+  .album-cover img{width:100%;height:100%;object-fit:cover;}
+  .album-info{padding:14px;}
+  .album-info h3{margin:0 0 3px;font-size:15.5px;}
+  .album-info p{margin:0;font-size:12.5px;color:var(--ink-soft);}
+
+  .members-list{display:flex;flex-direction:column;gap:2px;}
+  .member-row{display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--line);}
+  .member-row:last-child{border-bottom:none;}
+  .member-meta{flex:1;min-width:0;}
+  .member-meta .mname{font-weight:600;font-size:14.5px;}
+  .member-meta .msub{font-size:12.5px;color:var(--ink-soft);}
+  .member-actions{display:flex;gap:6px;}
+
+  .activity-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .activity-item:last-child{border-bottom:none;}
+  .activity-item .adot{width:6px;height:6px;border-radius:50%;background:var(--sage);margin-top:6px;flex-shrink:0;}
+
+  .notif-item{display:flex;gap:12px;padding:14px 6px;border-bottom:1px solid var(--line);}
+  .notif-item.unread{background:#FBF3EC;border-radius:10px;padding-left:12px;padding-right:12px;}
+  .notif-ico{width:34px;height:34px;border-radius:50%;background:var(--sage-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .notif-body b{font-weight:700;}
+  .notif-time{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+
+  .two-col{display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:860px){.two-col{grid-template-columns:1fr;}}
+
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto;}
+  .tab{padding:11px 16px;font-weight:600;font-size:14px;color:var(--ink-soft);border-bottom:2px solid transparent;white-space:nowrap;}
+  .tab.active{color:var(--brick);border-color:var(--brick);}
+
+  .fam-switch{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:13.5px;font-weight:600;}
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(20,15,10,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{background:var(--paper);border-radius:var(--radius);max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:26px;position:relative;}
+  .modal h2{margin:0 0 4px;font-size:21px;}
+  .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+  /* viewer */
+  .viewer-backdrop{position:fixed;inset:0;background:#100C09;z-index:120;display:flex;flex-direction:column;}
+  .viewer-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;color:#fff;}
+  .viewer-main{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:0;}
+  .viewer-media{max-width:min(78vw,900px);max-height:70vh;border-radius:10px;}
+  .viewer-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;}
+  .viewer-nav.prev{left:18px;}.viewer-nav.next{right:18px;}
+  .viewer-panel{background:var(--paper);width:100%;max-height:38vh;overflow-y:auto;padding:16px 20px;border-radius:16px 16px 0 0;}
+  @media (min-width:860px){
+    .viewer-backdrop{flex-direction:row;}
+    .viewer-main{flex:1;}
+    .viewer-panel{width:360px;max-height:none;border-radius:0;border-left:1px solid var(--line);}
+  }
+  .reaction-bar{display:flex;gap:6px;margin:10px 0 16px;flex-wrap:wrap;}
+  .rxn{padding:6px 11px;border-radius:999px;border:1.5px solid var(--line);font-size:13px;background:var(--paper);display:flex;gap:5px;align-items:center;}
+  .rxn.mine{border-color:var(--brick);background:#FBF0EC;}
+  .comment{display:flex;gap:9px;margin-bottom:14px;}
+  .comment .body{flex:1;}
+  .comment .head{font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center;}
+  .comment .txt{font-size:13.5px;color:var(--ink);margin-top:2px;}
+  .comment .meta{font-size:11px;color:var(--ink-soft);margin-top:3px;}
+  .comment .reply-link{font-size:11.5px;font-weight:700;color:var(--brick);margin-left:8px;cursor:pointer;}
+  .comment.reply{margin-left:38px;}
+
+  .dz{border:2px dashed var(--line);border-radius:var(--radius);padding:34px 20px;text-align:center;color:var(--ink-soft);cursor:pointer;transition:.15s;}
+  .dz.drag{border-color:var(--brick);background:#FBF3EC;}
+  .upload-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .progress{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;}
+  .progress > div{height:100%;background:var(--sage);transition:width .2s;}
+
+  .toast-wrap{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;}
+  .toast{background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow-lg);animation:slidein .2s;}
+  .toast.err{background:var(--danger);}
+  .toast.ok{background:#3E5D3A;}
+  @keyframes slidein{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .timeline-year{font-family:'Fraunces',serif;font-size:26px;margin:30px 0 14px;}
+  .timeline-event{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .timeline-event .tmonth{width:70px;flex-shrink:0;font-weight:700;color:var(--brick);font-size:13px;}
+
+  .code-chip{display:inline-flex;align-items:center;gap:8px;background:var(--sage-soft);color:var(--sage);font-weight:700;letter-spacing:.04em;padding:8px 16px;border-radius:999px;font-size:15px;}
+  .muted{color:var(--ink-soft);}
+  .small{font-size:12.5px;}
+  .divider{height:1px;background:var(--line);margin:20px 0;}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .grow{flex:1;}
+  .stack{display:flex;flex-direction:column;gap:10px;}
+  .search-box{position:relative;max-width:340px;}
+  .search-box input{padding-left:36px;}
+  .search-box .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =========================================================================
+   FAMILY ALBUM — functional demo build
+   Persistence: window.storage (shared=true) acts as the app's backend.
+   NOTE ON SESSION: per platform rules this artifact can't use
+   localStorage/sessionStorage, so login state lives in memory only and
+   resets on refresh — everything else (accounts, families, media,
+   comments, guest access, notifications) persists for real.
+   ========================================================================= */
+
+// ---------- tiny storage helpers ----------
+async function sget(key){ try{ const r = await window.storage.get(key, true); return r ? JSON.parse(r.value) : null; }catch(e){ return null; } }
+async function sset(key, val){ try{ return await window.storage.set(key, JSON.stringify(val), true); }catch(e){ console.error('storage set failed', key, e); return null; } }
+async function sdel(key){ try{ return await window.storage.delete(key, true); }catch(e){ return null; } }
+async function slist(prefix){ try{ const r = await window.storage.list(prefix, true); return r ? r.keys : []; }catch(e){ return []; } }
+
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4); }
+function famCode(){ const n = Math.floor(1000+Math.random()*9000); return 'FAM-'+n; }
+function guestCode(){ return 'GUEST-' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  if(s<2592000) return Math.floor(s/86400)+'d ago';
+  return new Date(ts).toLocaleDateString();
+}
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, type){
+  const el = document.createElement('div');
+  el.className = 'toast'+(type?' '+type:'');
+  el.textContent = msg;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=>el.remove(), 3400);
+}
+
+// ---------- global state (in-memory session) ----------
+const STATE = {
+  user: null,            // {email,name,avatar}
+  guest: null,           // {id,albumId,name,email} when in guest mode
+  route: 'landing',      // current view
+  routeParam: null,
+  activeFamilyId: null,
+  families: [],           // families current user belongs to [{...family, membership}]
+  notifCache: [],
+  loading: false,
+};
+
+function render(){ ROUTES[STATE.route] ? ROUTES[STATE.route]() : ROUTES.landing(); window.scrollTo(0,0); }
+function go(route, param){ STATE.route = route; STATE.routeParam = param; render(); }
+const app = ()=>document.getElementById('app');
+
+// ============================= DATA LAYER =============================
+
+async function createUser(name, email, password){
+  email = email.trim().toLowerCase();
+  const existing = await sget('users:'+email);
+  if(existing) throw new Error('An account with this email already exists.');
+  const user = { email, name, password, avatar:null, createdAt: Date.now() };
+  await sset('users:'+email, user);
+  await sset('userFamilies:'+email, []);
+  return user;
+}
+async function loginUser(email, password){
+  email = email.trim().toLowerCase();
+  const user = await sget('users:'+email);
+  if(!user || user.password !== password) throw new Error('Incorrect email or password.');
+  return user;
+}
+
+async function getUserFamilies(email){
+  const ids = await sget('userFamilies:'+email) || [];
+  const out = [];
+  for(const fid of ids){
+    const fam = await sget('families:'+fid);
+    const mem = await sget('memberships:'+fid+':'+email);
+    if(fam && mem) out.push({...fam, membership: mem});
+  }
+  return out;
+}
+
+async function createFamily(owner, data){
+  const id = uid('fam');
+  let code;
+  do{ code = famCode(); }while(await sget('famCode:'+code));
+  const fam = {
+    id, name:data.name, description:data.description||'', photo:data.photo||null,
+    location:data.location||'', origin:data.origin||'', foundedYear:data.foundedYear||'',
+    createdBy:owner.email, code, createdAt: Date.now()
+  };
+  await sset('families:'+id, fam);
+  await sset('famCode:'+code, id);
+  await sset('memberships:'+id+':'+owner.email, { role:'primary_admin', relationship:'Me', status:'approved', joinedAt:Date.now() });
+  const list = await sget('userFamilies:'+owner.email) || [];
+  list.push(id);
+  await sset('userFamilies:'+owner.email, list);
+  return fam;
+}
+
+async function requestJoinFamily(user, code, relationship){
+  const fid = await sget('famCode:'+code.trim().toUpperCase());
+  if(!fid) throw new Error('That family code was not found. Double-check it and try again.');
+  const existingMem = await sget('memberships:'+fid+':'+user.email);
+  if(existingMem) throw new Error('You already have a membership (status: '+existingMem.status+') with this family.');
+  await sset('memberships:'+fid+':'+user.email, { role:'member', relationship: relationship||'', status:'pending', joinedAt: Date.now() });
+  const list = await sget('userFamilies:'+user.email) || [];
+  if(!list.includes(fid)) list.push(fid);
+  await sset('userFamilies:'+user.email, list);
+  const fam = await sget('families:'+fid);
+  // notify admins
+  const memberKeys = await slist('memberships:'+fid+':');
+  for(const k of memberKeys){
+    const m = await sget(k);
+    if(m && (m.role==='primary_admin'||m.role==='admin') && m.status==='approved'){
+      const adminEmail = k.split(':')[2];
+      await notify(adminEmail, 'join_request', 'New family member request', user.name+' wants to join '+fam.name+'.');
+    }
+  }
+  return fam;
+}
+
+async function getFamilyMembers(familyId){
+  const keys = await slist('memberships:'+familyId+':');
+  const out = [];
+  for(const k of keys){
+    const email = k.split(':').slice(2).join(':');
+    const mem = await sget(k);
+    const user = await sget('users:'+email);
+    if(mem && user) out.push({email, ...mem, name:user.name, avatar:user.avatar});
+  }
+  out.sort((a,b)=> (a.joinedAt||0)-(b.joinedAt||0));
+  return out;
+}
+
+async function setMembership(familyId, email, patch){
+  const key = 'memberships:'+familyId+':'+email;
+  const mem = await sget(key);
+  if(!mem) return;
+  await sset(key, {...mem, ...patch});
+}
+
+async function removeMembership(familyId, email){
+  await sdel('memberships:'+familyId+':'+email);
+  const list = await sget('userFamilies:'+email) || [];
+  await sset('userFamilies:'+email, list.filter(f=>f!==familyId));
+}
+
+async function notify(email, type, title, message){
+  const id = uid('ntf');
+  await sset('notif:'+email+':'+id, { type, title, message, read:false, createdAt: Date.now() });
+}
+async function getNotifications(email){
+  const keys = await slist('notif:'+email+':');
+  const out = [];
+  for(const k of keys){ const n = await sget(k); if(n) out.push({key:k, ...n}); }
+  out.sort((a,b)=>b.createdAt-a.createdAt);
+  return out;
+}
+
+async function createAlbum(familyId, user, data){
+  const id = uid('alb');
+  const album = {
+    id, familyId, name:data.name, description:data.description||'', cover:null,
+    createdBy:user.email, createdByName:user.name, createdAt: Date.now(),
+    isArchive: !!data.isArchive, allowGuestDownloads:false
+  };
+  await sset('albums:'+familyId+':'+id, album);
+  await logActivity(familyId, user.name+' created the album "'+data.name+'".');
+  return album;
+}
+async function getAlbums(familyId){
+  const keys = await slist('albums:'+familyId+':');
+  const out = [];
+  for(const k of keys){ const a = await sget(k); if(a) out.push(a); }
+  out.sort((a,b)=>b.createdAt-a.createdAt);
+  return out;
+}
+async function getAlbum(familyId, albumId){ return await sget('albums:'+familyId+':'+albumId); }
+
+async function addMedia(familyId, albumId, uploader, data){
+  const id = uid('med');
+  const media = {
+    id, familyId, albumId, uploadedBy: uploader.email, uploadedByName: uploader.name,
+    type: data.type, dataUrl: data.dataUrl, videoUrl: data.videoUrl||null,
+    caption: data.caption||'', location: data.location||'', takenAt: data.takenAt || Date.now(),
+    createdAt: Date.now()
+  };
+  await sset('media:'+familyId+':'+id, media);
+  const album = await getAlbum(familyId, albumId);
+  if(album && !album.cover && data.type==='photo'){ album.cover = data.dataUrl; await sset('albums:'+familyId+':'+albumId, album); }
+  await logActivity(familyId, uploader.name+' uploaded a '+data.type+(album?' to "'+album.name+'"':'')+'.');
+  // notify other approved members
+  const members = await getFamilyMembers(familyId);
+  for(const m of members){
+    if(m.email!==uploader.email && m.status==='approved'){
+      await notify(m.email, 'new_media', 'New '+data.type, uploader.name+' added a new '+data.type+(album?' to '+album.name:'')+'.');
+    }
+  }
+  return media;
+}
+async function getMediaForAlbum(familyId, albumId){
+  const keys = await slist('media:'+familyId+':');
+  const out = [];
+  for(const k of keys){ const m = await sget(k); if(m && m.albumId===albumId) out.push(m); }
+  out.sort((a,b)=>a.createdAt-b.createdAt);
+  return out;
+}
+async function getAllMedia(familyId){
+  const keys = await slist('media:'+familyId+':');
+  const out = [];
+  for(const k of keys){ const m = await sget(k); if(m) out.push(m); }
+  out.sort((a,b)=>b.createdAt-a.createdAt);
+  return out;
+}
+
+async function logActivity(familyId, text){
+  const id = uid('act');
+  await sset('activity:'+familyId+':'+id, { text, createdAt: Date.now() });
+}
+async function getActivity(familyId, limit){
+  const keys = await slist('activity:'+familyId+':');
+  const out = [];
+  for(const k of keys){ const a = await sget(k); if(a) out.push(a); }
+  out.sort((a,b)=>b.createdAt-a.createdAt);
+  return limit ? out.slice(0,limit) : out;
+}
+
+async function addComment(mediaId, authorLabel, authorType, content, parentId){
+  const id = uid('cmt');
+  await sset('comment:'+mediaId+':'+id, { authorLabel, authorType, content, parentId: parentId||null, createdAt: Date.now() });
+  return id;
+}
+async function getComments(mediaId){
+  const keys = await slist('comment:'+mediaId+':');
+  const out = [];
+  for(const k of keys){ const c = await sget(k); if(c) out.push({key:k, ...c}); }
+  out.sort((a,b)=>a.createdAt-b.createdAt);
+  return out;
+}
+
+async function toggleReaction(mediaId, actorKey, type){
+  const key = 'rxn:'+mediaId+':'+actorKey;
+  const existing = await sget(key);
+  if(existing && existing.type===type){ await sdel(key); return null; }
+  await sset(key, { type, createdAt: Date.now() });
+  return type;
+}
+async function getReactions(mediaId){
+  const keys = await slist('rxn:'+mediaId+':');
+  const out = [];
+  for(const k of keys){ const r = await sget(k); if(r) out.push({actor:k.split(':')[2], ...r}); }
+  return out;
+}
+
+async function inviteGuests(familyId, albumId, inviter, guestsInput){
+  // guestsInput: array of {name, email}
+  const created = [];
+  for(const g of guestsInput){
+    if(!g.name || !g.email) continue;
+    const id = uid('gst');
+    const code = guestCode();
+    const rec = { id, albumId, familyId, name:g.name, email:g.email.trim().toLowerCase(), code, status:'active', invitedBy:inviter.email, createdAt: Date.now(), removedAt:null };
+    await sset('guest:'+albumId+':'+id, rec);
+    created.push(rec);
+  }
+  return created;
+}
+async function getGuestsForAlbum(albumId){
+  const keys = await slist('guest:'+albumId+':');
+  const out = [];
+  for(const k of keys){ const g = await sget(k); if(g) out.push(g); }
+  out.sort((a,b)=>a.createdAt-b.createdAt);
+  return out;
+}
+async function removeGuest(albumId, guestId){
+  const key = 'guest:'+albumId+':'+guestId;
+  const g = await sget(key);
+  if(g){ g.status='removed'; g.removedAt=Date.now(); await sset(key,g); }
+}
+async function guestLogin(code, email){
+  // search all guest keys — scoped scan by known album isn't possible without albumId,
+  // so we keep a lookup index by code.
+  const albumId = await sget('guestCode:'+code.trim().toUpperCase());
+  if(!albumId) throw new Error('Guest code not recognized.');
+  const keys = await slist('guest:'+albumId+':');
+  for(const k of keys){
+    const g = await sget(k);
+    if(g && g.code===code.trim().toUpperCase() && g.email===email.trim().toLowerCase()){
+      if(g.status==='removed') throw new Error('This guest access has been removed by the family admin.');
+      return g;
+    }
+  }
+  throw new Error('No matching guest invitation found for that code and email.');
+}
+
+// patch inviteGuests to also write the code index
+const _origInviteGuests = inviteGuests;
+inviteGuests = async function(familyId, albumId, inviter, guestsInput){
+  const created = await _origInviteGuests(familyId, albumId, inviter, guestsInput);
+  for(const g of created){ await sset('guestCode:'+g.code, albumId); }
+  const album = await getAlbum(familyId, albumId);
+  for(const g of created){
+    await logActivity(familyId, inviter.name+' invited '+g.name+' as a guest to "'+(album?album.name:'an album')+'".');
+  }
+  return created;
+};
+
+// ============================= IMAGE HELPERS =============================
+function fileToCompressedDataUrl(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e=>{ img.onload = ()=>{
+        let {width,height} = img;
+        if(width>height && width>maxDim){ height*=maxDim/width; width=maxDim; }
+        else if(height>maxDim){ width*=maxDim/height; height=maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width=width; canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg', quality||0.78));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================= UI: SHELL =============================
+
+function shell(innerHtml, opts){
+  opts = opts || {};
+  const loggedIn = !!STATE.user;
+  const fam = currentFamily();
+  return `
+    <div class="topnav"><div class="container topnav-inner">
+      <a class="brand" href="#" onclick="go('${loggedIn?'dashboard':'landing'}');return false;">
+        <span class="mark">◆</span> Family Album
+      </a>
+      ${loggedIn ? `
+      <div class="nav-links">
+        ${navLink('dashboard','Home')}
+        ${navLink('albums','Albums')}
+        ${navLink('timeline','Timeline')}
+        ${navLink('archive','Archive')}
+        ${navLink('members','Family')}
+      </div>
+      <div class="nav-right">
+        ${fam ? famSwitcher() : ''}
+        <button class="icon-btn" title="Upload" onclick="openUploadModal()">⤴</button>
+        <button class="icon-btn" title="Notifications" onclick="go('notifications')">🔔${opts.unread?'<span class="dot"></span>':''}</button>
+        <a class="avatar avatar-sm" href="#" onclick="go('profile');return false;" title="${esc(STATE.user.name)}">${STATE.user.avatar?`<img src="${STATE.user.avatar}">`:initials(STATE.user.name)}</a>
+      </div>` : `
+      <div class="nav-right">
+        <a class="btn btn-ghost btn-sm" href="#" onclick="go('login');return false;">Log in</a>
+        <a class="btn btn-primary btn-sm" href="#" onclick="go('register');return false;">Get started</a>
+      </div>`}
+    </div></div>
+    <div>${innerHtml}</div>
+    ${loggedIn ? `<div class="bottomnav">
+      ${bnav('dashboard','⌂','Home')}
+      ${bnav('albums','▦','Albums')}
+      ${bnav('timeline','☰','Timeline')}
+      ${bnav('members','◎','Family')}
+      ${bnav('notifications','🔔','Alerts')}
+    </div>
+    <button class="fab-upload" onclick="openUploadModal()">⤴</button>` : ''}
+  `;
+}
+function navLink(route,label){
+  return `<a class="nav-link ${STATE.route===route?'active':''}" href="#" onclick="go('${route}');return false;">${label}</a>`;
+}
+function bnav(route,ic,label){
+  return `<a class="${STATE.route===route?'active':''}" href="#" onclick="go('${route}');return false;"><span class="bicon">${ic}</span>${label}</a>`;
+}
+function currentFamily(){ return STATE.families.find(f=>f.id===STATE.activeFamilyId); }
+function famSwitcher(){
+  const fam = currentFamily();
+  if(!fam) return '';
+  return `<div class="fam-switch" onclick="openFamilySwitcher()">
+    <span class="avatar avatar-sm">${fam.photo?`<img src="${fam.photo}">`:initials(fam.name)}</span>
+    <span>${esc(fam.name)}</span> <span style="opacity:.5">▾</span>
+  </div>`;
+}
+function isAdmin(fam){ return fam && (fam.membership.role==='primary_admin'||fam.membership.role==='admin'); }
+function isPrimary(fam){ return fam && fam.membership.role==='primary_admin'; }
+
+async function requireFamilyContext(){
+  if(!STATE.user){ go('landing'); return false; }
+  STATE.families = await getUserFamilies(STATE.user.email);
+  const approved = STATE.families.filter(f=>f.membership.status==='approved');
+  if(!STATE.activeFamilyId || !approved.find(f=>f.id===STATE.activeFamilyId)){
+    STATE.activeFamilyId = approved[0] ? approved[0].id : null;
+  }
+  return true;
+}
+
+// ============================= ROUTES =============================
+const ROUTES = {};
+
+ROUTES.landing = function(){
+  app().innerHTML = shell(`
+    <div class="hero">
+      <h1>Your family's story,<br><span class="accent">preserved together.</span></h1>
+      <p>Keep your family's photographs and videos together, share memories with the people who matter, and preserve your family's story for generations.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#" onclick="go('register');return false;">Create your family album</a>
+        <a class="btn btn-ghost" href="#" onclick="go('join');return false;">Join a family</a>
+      </div>
+    </div>
+    <div class="container">
+      <div class="feature-grid">
+        ${feature('🖼','Store memories','Keep every photo and video organized by album, date, and moment.')}
+        ${feature('🏡','Share with family','A private space just for your family — no public feed, no strangers.')}
+        ${feature('🕰','Preserve your history','Digitize old family photographs and give them a permanent home.')}
+        ${feature('💬','Celebrate together','React, comment, and relive memories side by side with the people in them.')}
+        ${feature('🤝','Invite guests','Share a single album with friends or extended contacts, without opening your whole library.')}
+        ${feature('🔒','Stay in control','Admins approve every member and can revoke guest access any time.')}
+      </div>
+    </div>
+    <footer class="site-footer">Family Album — a private space for the people who matter.</footer>
+  `);
+};
+function feature(ic,title,body){ return `<div class="feature"><div class="fico">${ic}</div><h3>${title}</h3><p>${body}</p></div>`; }
+
+ROUTES.register = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card auth-card">
+      <h2 style="margin-top:0">Create your account</h2>
+      <p class="muted small">Start by creating a personal account. You'll create or join a family next.</p>
+      <form id="regForm">
+        <label>Full name</label><input required name="name" placeholder="Kelvin Maduabuchi">
+        <label>Email</label><input required type="email" name="email" placeholder="you@email.com">
+        <label>Password</label><input required type="password" name="password" minlength="6" placeholder="At least 6 characters">
+        <button class="btn btn-primary btn-block" style="margin-top:20px" type="submit">Create account</button>
+      </form>
+      <p class="small muted" style="margin-top:16px;text-align:center">Already have an account? <a href="#" style="color:var(--brick);font-weight:700" onclick="go('login');return false;">Log in</a></p>
+    </div></div>
+  `);
+  document.getElementById('regForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try{
+      const user = await createUser(f.get('name'), f.get('email'), f.get('password'));
+      STATE.user = user;
+      toast('Welcome, '+user.name.split(' ')[0]+'! (email verification is simulated for this demo)', 'ok');
+      go('onboarding');
+    }catch(err){ toast(err.message, 'err'); }
+  };
+};
+
+ROUTES.login = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card auth-card">
+      <h2 style="margin-top:0">Log in</h2>
+      <form id="loginForm">
+        <label>Email</label><input required type="email" name="email">
+        <label>Password</label><input required type="password" name="password">
+        <button class="btn btn-primary btn-block" style="margin-top:20px" type="submit">Log in</button>
+      </form>
+      <p class="small muted" style="margin-top:16px;text-align:center">New here? <a href="#" style="color:var(--brick);font-weight:700" onclick="go('register');return false;">Create an account</a></p>
+      <p class="small muted" style="text-align:center">Invited as a guest? <a href="#" style="color:var(--brick);font-weight:700" onclick="go('guestLogin');return false;">Enter your guest code</a></p>
+    </div></div>
+  `);
+  document.getElementById('loginForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try{
+      const user = await loginUser(f.get('email'), f.get('password'));
+      STATE.user = user;
+      await requireFamilyContext();
+      toast('Welcome back, '+user.name.split(' ')[0]+'.', 'ok');
+      go(STATE.families.length ? 'dashboard' : 'onboarding');
+    }catch(err){ toast(err.message, 'err'); }
+  };
+};
+
+ROUTES.onboarding = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card" style="max-width:520px;width:100%;text-align:center">
+      <h2 style="margin-top:0">Let's set up your first family space</h2>
+      <p class="muted">You can create a brand-new family, or join one you've already been invited to.</p>
+      <div class="hero-actions" style="margin-top:22px">
+        <a class="btn btn-primary" href="#" onclick="go('createFamily');return false;">Create a family</a>
+        <a class="btn btn-ghost" href="#" onclick="go('join');return false;">Join with a family code</a>
+      </div>
+    </div></div>
+  `);
+};
+
+ROUTES.createFamily = function(){
+  if(!STATE.user){ go('login'); return; }
+  app().innerHTML = shell(`
+    <div class="page container" style="max-width:600px">
+      <h1>Create your family</h1>
+      <p class="muted">This becomes your family's private space. You'll be the Primary Admin.</p>
+      <div class="card">
+        <form id="famForm">
+          <label>Family name</label><input required name="name" placeholder="The Maduabuchi Family">
+          <label>Description</label><textarea name="description" placeholder="A little about your family..."></textarea>
+          <div class="field-row">
+            <div><label>Location (optional)</label><input name="location" placeholder="Lagos, Nigeria"></div>
+            <div><label>Founding year (optional)</label><input name="foundedYear" placeholder="1978"></div>
+          </div>
+          <label>Family origin (optional)</label><input name="origin" placeholder="e.g. Abia State">
+          <button class="btn btn-primary btn-block" style="margin-top:20px" type="submit">Create family</button>
+        </form>
+      </div>
+    </div>
+  `);
+  document.getElementById('famForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const fam = await createFamily(STATE.user, Object.fromEntries(f));
+    STATE.activeFamilyId = fam.id;
+    STATE.families = await getUserFamilies(STATE.user.email);
+    go('familyWelcome', fam.id);
+  };
+};
+
+ROUTES.familyWelcome = function(){
+  const fam = STATE.families.find(f=>f.id===STATE.routeParam) || currentFamily();
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card" style="max-width:480px;width:100%;text-align:center">
+      <div class="avatar avatar-lg" style="margin:0 auto 14px">${fam.photo?`<img src="${fam.photo}">`:initials(fam.name)}</div>
+      <h2 style="margin:0 0 6px">${esc(fam.name)} is ready</h2>
+      <p class="muted">Share this code with family so they can request to join.</p>
+      <div class="code-chip" style="margin:14px 0">${fam.code} <span style="cursor:pointer" onclick="navigator.clipboard&&navigator.clipboard.writeText('${fam.code}');toast('Code copied')">⧉</span></div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#" onclick="go('members');return false;">Invite family</a>
+        <a class="btn btn-ghost" href="#" onclick="go('dashboard');return false;">Go to dashboard</a>
+      </div>
+    </div></div>
+  `);
+};
+
+ROUTES.join = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card auth-card">
+      <h2 style="margin-top:0">Join a family</h2>
+      <p class="muted small">Your request will be reviewed by a Family Admin before you receive access.</p>
+      <form id="joinForm">
+        ${!STATE.user ? `
+        <label>Full name</label><input required name="name">
+        <label>Email</label><input required type="email" name="email">
+        <label>Password</label><input required type="password" name="password" minlength="6">
+        ` : ''}
+        <label>Family code</label><input required name="code" placeholder="FAM-1234" style="text-transform:uppercase">
+        <label>Your relationship to this family (optional)</label><input name="relationship" placeholder="e.g. Daughter, Cousin, Grandson">
+        <button class="btn btn-primary btn-block" style="margin-top:20px" type="submit">Request to join</button>
+      </form>
+    </div></div>
+  `);
+  document.getElementById('joinForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try{
+      let user = STATE.user;
+      if(!user) user = await createUser(f.get('name'), f.get('email'), f.get('password'));
+      const fam = await requestJoinFamily(user, f.get('code'), f.get('relationship'));
+      STATE.user = user;
+      go('requestSubmitted', fam.name);
+    }catch(err){ toast(err.message, 'err'); }
+  };
+};
+
+ROUTES.requestSubmitted = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card" style="max-width:440px;text-align:center">
+      <div style="font-size:38px;margin-bottom:10px">✓</div>
+      <h2 style="margin:0 0 8px">Request submitted</h2>
+      <p class="muted">Your membership request for <b>${esc(STATE.routeParam||'this family')}</b> is waiting for Admin approval. You'll get a notification as soon as it's reviewed.</p>
+      <a class="btn btn-primary" href="#" onclick="go('dashboard');return false;">Go to my account</a>
+    </div></div>
+  `);
+};
+
+ROUTES.guestLogin = function(){
+  app().innerHTML = shell(`
+    <div class="center-screen"><div class="card auth-card">
+      <h2 style="margin-top:0">Guest access</h2>
+      <p class="muted small">Enter the guest code and email an admin shared with you.</p>
+      <form id="gForm">
+        <label>Guest code</label><input required name="code" placeholder="GUEST-A1B2C3" style="text-transform:uppercase">
+        <label>Your email</label><input required type="email" name="email">
+        <button class="btn btn-primary btn-block" style="margin-top:20px" type="submit">View album</button>
+      </form>
+    </div></div>
+  `);
+  document.getElementById('gForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try{
+      const g = await guestLogin(f.get('code'), f.get('email'));
+      STATE.guest = g; STATE.user = null;
+      go('guestAlbum', g.albumId);
+    }catch(err){ toast(err.message,'err'); }
+  };
+};
+
+ROUTES.guestAlbum = async function(){
+  const g = STATE.guest;
+  if(!g){ go('guestLogin'); return; }
+  const album = await getAlbum(g.familyId, g.albumId);
+  const fam = await sget('families:'+g.familyId);
+  const media = await getMediaForAlbum(g.familyId, g.albumId);
+  app().innerHTML = `
+    <div class="topnav"><div class="container topnav-inner">
+      <div class="brand"><span class="mark">◆</span> Family Album</div>
+      <div class="nav-right">
+        <span class="badge badge-guest">${esc(g.name)} · Guest</span>
+        <button class="btn btn-ghost btn-sm" onclick="STATE.guest=null;go('landing')">Exit</button>
+      </div>
+    </div></div>
+    <div class="page container">
+      <p class="muted small">${esc(fam ? fam.name : '')}</p>
+      <h1>${esc(album ? album.name : 'Album')}</h1>
+      <p class="muted">${esc(album ? album.description : '')}</p>
+      ${media.length===0 ? emptyState('🖼','No photos yet',"The family hasn't added anything to this album yet.") : `
+      <div class="media-grid">${media.map((m,i)=>mediaTile(m,i,'guestMediaList')).join('')}</div>`}
+    </div>
+  `;
+  window.guestMediaList = media;
+};
+
+// ---------- DASHBOARD ----------
+ROUTES.dashboard = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily();
+  if(!fam){ go('onboarding'); return; }
+  const notifs = await getNotifications(STATE.user.email);
+  const unread = notifs.filter(n=>!n.read).length;
+  const media = (await getAllMedia(fam.id)).slice(0,10);
+  const albums = (await getAlbums(fam.id)).slice(0,4);
+  const members = (await getFamilyMembers(fam.id)).filter(m=>m.status==='approved').slice(0,6);
+  const activity = await getActivity(fam.id, 6);
+
+  app().innerHTML = shell(`
+    <div class="page container">
+      <div class="page-head">
+        <div>
+          <p class="greet">${greeting()}, ${esc(STATE.user.name.split(' ')[0])}</p>
+          <h1>The ${esc(fam.name)}</h1>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="openUploadModal()">Upload photos &amp; videos</button>
+          <button class="btn btn-ghost" onclick="openCreateAlbumModal()">Create album</button>
+          <button class="btn btn-ghost" onclick="go('members')">Invite family</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="section-title"><h2>Recent memories</h2><a class="see-all" href="#" onclick="go('albums');return false;">View albums →</a></div>
+          ${media.length===0 ? emptyState('🖼','No photos yet',"Your family's first memory starts here.", `<button class="btn btn-primary" onclick="openUploadModal()">Upload photos</button>`) :
+            `<div class="media-grid">${media.map((m,i)=>mediaTile(m,i,'dashMedia')).join('')}</div>`}
+
+          <div class="section-title"><h2>Albums</h2><a class="see-all" href="#" onclick="go('albums');return false;">See all →</a></div>
+          ${albums.length===0 ? emptyState('📁','No albums yet','Create your first family album.', `<button class="btn btn-primary" onclick="openCreateAlbumModal()">Create album</button>`) :
+            `<div class="album-grid">${albums.map(albumCard).join('')}</div>`}
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="flex-between"><h3 style="margin:0">Family members</h3><a class="see-all" href="#" onclick="go('members');return false;">Manage</a></div>
+            <div class="members-list" style="margin-top:10px">
+              ${members.map(m=>`<div class="member-row"><span class="avatar avatar-sm">${m.avatar?`<img src="${m.avatar}">`:initials(m.name)}</span><div class="member-meta"><div class="mname">${esc(m.name)}</div><div class="msub">${roleLabel(m.role)}</div></div></div>`).join('') || `<p class="muted small">No members yet.</p>`}
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin:0 0 4px">Recent activity</h3>
+            <div>${activity.map(a=>`<div class="activity-item"><span class="adot"></span><div>${esc(a.text)}<div class="small muted">${timeAgo(a.createdAt)}</div></div></div>`).join('') || `<p class="muted small">No activity yet.</p>`}</div>
+          </div>
+          <div class="card">
+            <div class="flex-between"><h3 style="margin:0">Notifications</h3>${unread?`<span class="badge badge-primary">${unread} new</span>`:''}</div>
+            <div>${notifs.slice(0,4).map(notifRow).join('') || `<p class="muted small">You're all caught up.</p>`}</div>
+            <a class="see-all" href="#" onclick="go('notifications');return false;" style="display:inline-block;margin-top:8px">View all →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `, {unread});
+  window.dashMedia = media;
+};
+function greeting(){ const h = new Date().getHours(); return h<12?'Good morning':h<18?'Good afternoon':'Good evening'; }
+function roleLabel(r){ return r==='primary_admin'?'Primary Admin':r==='admin'?'Admin':r==='pending'?'Pending':'Member'; }
+function emptyState(ic,title,body,extra){
+  return `<div class="empty"><div style="font-size:30px">${ic}</div><h3>${title}</h3><p>${body}</p>${extra||''}</div>`;
+}
+function mediaTile(m,i,arrName){
+  return `<div class="media-tile" onclick="openViewer(${JSON.stringify(arrName)}, ${i})">
+    ${m.type==='video' ? `<video src="${m.videoUrl||m.dataUrl}" muted></video><span class="vtag">▶ video</span>` : `<img src="${m.dataUrl}" loading="lazy">`}
+  </div>`;
+}
+function albumCard(a){
+  return `<div class="album-card" onclick="go('album','${a.id}')">
+    <div class="album-cover">${a.cover?`<img src="${a.cover}">`:'📁'}</div>
+    <div class="album-info"><h3>${esc(a.name)}${a.isArchive?' <span class="badge badge-admin" style="font-size:9px">Archive</span>':''}</h3><p>${timeAgo(a.createdAt)}</p></div>
+  </div>`;
+}
+function notifRow(n){
+  return `<div class="notif-item ${n.read?'':'unread'}">
+    <div class="notif-ico">${notifIcon(n.type)}</div>
+    <div class="notif-body"><div>${esc(n.title)}</div><div class="small muted">${esc(n.message)}</div><div class="notif-time">${timeAgo(n.createdAt)}</div></div>
+  </div>`;
+}
+function notifIcon(t){
+  const map = {join_request:'🙋',approval:'✅',decline:'✖',new_media:'🖼',comment:'💬',reaction:'❤️',guest_invite:'🤝',admin_promote:'⭐',member_removed:'🚪'};
+  return map[t]||'🔔';
+}
+
+// ---------- FAMILY SWITCHER ----------
+function openFamilySwitcher(){
+  const options = STATE.families.filter(f=>f.membership.status==='approved');
+  openModal(`
+    <h2>Switch family</h2>
+    <div class="stack" style="margin-top:14px">
+      ${options.map(f=>`<div class="member-row" style="cursor:pointer" onclick="switchFamily('${f.id}')">
+        <span class="avatar">${f.photo?`<img src="${f.photo}">`:initials(f.name)}</span>
+        <div class="member-meta"><div class="mname">${esc(f.name)}</div><div class="msub">${roleLabel(f.membership.role)}</div></div>
+        ${f.id===STATE.activeFamilyId?'<span>✓</span>':''}
+      </div>`).join('')}
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn-ghost btn-block" onclick="closeModal();go('onboarding')">+ Create or join another family</button>
+  `);
+}
+function switchFamily(id){ STATE.activeFamilyId = id; closeModal(); go('dashboard'); }
+
+// ---------- ALBUMS ----------
+ROUTES.albums = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily(); if(!fam){ go('onboarding'); return; }
+  const albums = (await getAlbums(fam.id)).filter(a=>!a.isArchive);
+  app().innerHTML = shell(`
+    <div class="page container">
+      <div class="page-head"><h1>Albums</h1>
+        <div class="quick-actions">
+          <div class="search-box"><span class="si">🔍</span><input id="albumSearch" placeholder="Search albums..."></div>
+          <button class="btn btn-primary" onclick="openCreateAlbumModal()">Create album</button>
+        </div>
+      </div>
+      <div id="albumGridWrap">${albums.length===0 ? emptyState('📁','No albums yet','Create your first family album.', `<button class="btn btn-primary" onclick="openCreateAlbumModal()">Create album</button>`) : `<div class="album-grid">${albums.map(albumCard).join('')}</div>`}</div>
+    </div>
+  `);
+  document.getElementById('albumSearch').oninput = (e)=>{
+    const q = e.target.value.toLowerCase();
+    const filtered = albums.filter(a=>a.name.toLowerCase().includes(q) || (a.description||'').toLowerCase().includes(q));
+    document.getElementById('albumGridWrap').innerHTML = filtered.length ? `<div class="album-grid">${filtered.map(albumCard).join('')}</div>` : `<p class="muted">No albums match "${esc(e.target.value)}".</p>`;
+  };
+};
+
+ROUTES.archive = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily(); if(!fam){ go('onboarding'); return; }
+  const albums = (await getAlbums(fam.id)).filter(a=>a.isArchive);
+  app().innerHTML = shell(`
+    <div class="page container">
+      <div class="page-head">
+        <div><h1>Family Archive</h1><p class="muted">Historical photos — grandparents, old weddings, and celebrations from before.</p></div>
+        <button class="btn btn-primary" onclick="openCreateAlbumModal(true)">Add to archive</button>
+      </div>
+      ${albums.length===0 ? emptyState('🕰','Nothing archived yet','Preserve an old family photo by starting an archive album.', `<button class="btn btn-primary" onclick="openCreateAlbumModal(true)">Start an archive album</button>`) : `<div class="album-grid">${albums.map(albumCard).join('')}</div>`}
+    </div>
+  `);
+};
+
+function openCreateAlbumModal(isArchive){
+  openModal(`
+    <h2>${isArchive?'New archive album':'Create album'}</h2>
+    <form id="albForm">
+      <label>Album name</label><input required name="name" placeholder="${isArchive?'Grandma & Grandpa, 1965':'Christmas 2025'}">
+      <label>Description (optional)</label><textarea name="description"></textarea>
+      <button class="btn btn-primary btn-block" style="margin-top:18px" type="submit">Create album</button>
+    </form>
+  `);
+  document.getElementById('albForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    f.isArchive = !!isArchive;
+    const album = await createAlbum(STATE.activeFamilyId, STATE.user, f);
+    closeModal(); toast('Album created'); go('album', album.id);
+  };
+}
+
+ROUTES.album = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily(); if(!fam){ go('albums'); return; }
+  const album = await getAlbum(fam.id, STATE.routeParam);
+  if(!album){ go('albums'); return; }
+  const media = await getMediaForAlbum(fam.id, album.id);
+  const admin = isAdmin(fam);
+  app().innerHTML = shell(`
+    <div class="page container">
+      <a class="small muted" href="#" onclick="go('albums');return false;">← Albums</a>
+      <div class="page-head">
+        <div><h1>${esc(album.name)}</h1><p class="muted">${esc(album.description||'')} · ${media.length} item${media.length===1?'':'s'} · by ${esc(album.createdByName)}</p></div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="openUploadModal('${album.id}')">Add photos/videos</button>
+          ${admin ? `<button class="btn btn-ghost" onclick="openShareAlbumModal('${album.id}')">Share with guests</button>` : ''}
+        </div>
+      </div>
+      ${media.length===0 ? emptyState('🖼','No photos yet','Add the first memory to this album.', `<button class="btn btn-primary" onclick="openUploadModal('${album.id}')">Upload photos</button>`) :
+        `<div class="media-grid">${media.map((m,i)=>mediaTile(m,i,'albumMedia')).join('')}</div>`}
+    </div>
+  `);
+  window.albumMedia = media;
+};
+
+function openShareAlbumModal(albumId){
+  openModal(`
+    <h2>Share album with guests</h2>
+    <p class="muted small">Guests can view, comment, and react — but never upload or see the rest of your family library. Access doesn't expire until you remove it.</p>
+    <form id="guestForm">
+      <label>Guest name</label><input required name="gname" placeholder="Sarah Johnson">
+      <label>Guest email</label><input required type="email" name="gemail" placeholder="sarah@email.com">
+      <button class="btn btn-primary btn-block" style="margin-top:16px" type="submit">Add guest</button>
+      <p class="hint">Add as many guests as you like, one at a time — there's no limit.</p>
+    </form>
+    <div class="divider"></div>
+    <div id="guestListWrap"></div>
+  `);
+  renderGuestList(albumId);
+  document.getElementById('guestForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const created = await inviteGuests(STATE.activeFamilyId, albumId, STATE.user, [{name:f.get('gname'), email:f.get('gemail')}]);
+    e.target.reset();
+    const g = created[0];
+    toast('Guest added — share code '+g.code+' with '+g.name);
+    renderGuestList(albumId);
+  };
+}
+async function renderGuestList(albumId){
+  const guests = await getGuestsForAlbum(albumId);
+  const active = guests.filter(g=>g.status==='active');
+  document.getElementById('guestListWrap').innerHTML = `
+    <h3 style="margin:0 0 8px;font-size:15px">Guests with access (${active.length})</h3>
+    ${active.length===0 ? `<p class="muted small">No guests yet.</p>` : active.map(g=>`
+      <div class="member-row">
+        <span class="avatar avatar-sm">${initials(g.name)}</span>
+        <div class="member-meta"><div class="mname">${esc(g.name)} <span class="badge badge-guest">Guest</span></div>
+        <div class="msub">${esc(g.email)} · code ${g.code}</div></div>
+        <button class="btn btn-danger btn-sm" onclick="doRemoveGuest('${albumId}','${g.id}')">Remove access</button>
+      </div>`).join('')}
+  `;
+}
+async function doRemoveGuest(albumId, guestId){
+  await removeGuest(albumId, guestId);
+  toast('Guest access removed');
+  renderGuestList(albumId);
+}
+
+// ---------- UPLOAD ----------
+async function openUploadModal(presetAlbumId){
+  const fam = currentFamily();
+  const albums = await getAlbums(fam.id);
+  openModal(`
+    <h2>Upload photos &amp; videos</h2>
+    <label>Album</label>
+    <select id="upAlbum">
+      ${albums.map(a=>`<option value="${a.id}" ${a.id===presetAlbumId?'selected':''}>${esc(a.name)}</option>`).join('') || '<option disabled>Create an album first</option>'}
+    </select>
+    <label>Caption (applies to all files this batch)</label><input id="upCaption" placeholder="Optional caption">
+    <div class="dz" id="dz" style="margin-top:16px" onclick="document.getElementById('fileInput').click()">
+      <div style="font-size:26px">⤴</div>
+      <p><b>Drag and drop</b> photos or videos here, or click to choose files</p>
+      <p class="small">JPG, PNG, WEBP, MP4, MOV — images are optimized automatically for fast loading</p>
+    </div>
+    <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display:none">
+    <div id="upList" style="margin-top:12px"></div>
+  `);
+  if(albums.length===0){ toast('Create an album first', 'err'); }
+  const dz = document.getElementById('dz');
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev, e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev, e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop', e=>handleFiles(e.dataTransfer.files));
+  document.getElementById('fileInput').addEventListener('change', e=>handleFiles(e.target.files));
+}
+async function handleFiles(fileList){
+  const files = Array.from(fileList);
+  if(files.length===0) return;
+  const albumId = document.getElementById('upAlbum').value;
+  const caption = document.getElementById('upCaption').value;
+  const listEl = document.getElementById('upList');
+  if(!albumId){ toast('Choose or create an album first', 'err'); return; }
+  for(const file of files){
+    const rowId = uid('row');
+    const isVideo = file.type.startsWith('video');
+    listEl.insertAdjacentHTML('beforeend', `<div class="upload-row" id="${rowId}"><span>${isVideo?'🎬':'🖼'}</span><span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(file.name)}</span><div class="progress"><div style="width:15%"></div></div><span class="status">…</span></div>`);
+    const row = document.getElementById(rowId);
+    const bar = row.querySelector('.progress > div');
+    const status = row.querySelector('.status');
+    try{
+      if(isVideo && file.size > 4.5*1024*1024){
+        throw new Error('Video too large for demo storage (4.5MB limit). In production this uploads to cloud video storage.');
+      }
+      bar.style.width='45%';
+      let dataUrl;
+      if(isVideo){
+        dataUrl = await fileToDataUrlRaw(file);
+      } else {
+        dataUrl = await fileToCompressedDataUrl(file, 1600, 0.78);
+      }
+      bar.style.width='80%';
+      await addMedia(STATE.activeFamilyId, albumId, STATE.user, { type: isVideo?'video':'photo', dataUrl, caption });
+      bar.style.width='100%';
+      status.textContent = '✓';
+    }catch(err){
+      status.textContent = '⚠';
+      status.title = err.message;
+      row.insertAdjacentHTML('beforeend', `<button class="btn btn-sm btn-ghost" onclick="toast('${esc(err.message)}','err')">details</button>`);
+    }
+  }
+  toast('Upload complete', 'ok');
+}
+function fileToDataUrlRaw(file){
+  return new Promise((res,rej)=>{ const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+}
+
+// ---------- VIEWER ----------
+let viewerState = { list:[], index:0 };
+async function openViewer(listVarName, index){
+  viewerState.list = window[listVarName] || [];
+  viewerState.index = index;
+  await renderViewer();
+}
+async function renderViewer(){
+  const m = viewerState.list[viewerState.index];
+  if(!m) return;
+  const comments = await getComments(m.id);
+  const reactions = await getReactions(m.id);
+  const actorKey = STATE.guest ? 'guest_'+STATE.guest.id : STATE.user.email;
+  const counts = {};
+  reactions.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
+  const mine = reactions.find(r=>r.actor===actorKey);
+  const topLevel = comments.filter(c=>!c.parentId);
+  const repliesOf = pid => comments.filter(c=>c.parentId===pid);
+
+  let el = document.getElementById('viewerRoot');
+  if(!el){ el = document.createElement('div'); el.id='viewerRoot'; document.body.appendChild(el); }
+  el.innerHTML = `
+  <div class="viewer-backdrop">
+    <div class="viewer-main">
+      <div class="viewer-top" style="position:absolute;top:0;left:0;right:0">
+        <span>${esc(m.uploadedByName)} · ${new Date(m.takenAt).toLocaleDateString()}</span>
+        <button class="modal-close" style="position:static;background:rgba(255,255,255,.15);border:none;color:#fff" onclick="closeViewer()">✕</button>
+      </div>
+      ${viewerState.index>0?`<button class="viewer-nav prev" onclick="stepViewer(-1)">‹</button>`:''}
+      ${m.type==='video' ? `<video class="viewer-media" src="${m.videoUrl||m.dataUrl}" controls autoplay></video>` : `<img class="viewer-media" src="${m.dataUrl}">`}
+      ${viewerState.index<viewerState.list.length-1?`<button class="viewer-nav next" onclick="stepViewer(1)">›</button>`:''}
+    </div>
+    <div class="viewer-panel">
+      ${m.caption?`<p style="margin:0 0 10px">${esc(m.caption)}</p>`:''}
+      <div class="reaction-bar">
+        ${['❤️','😂','😍','👏','🎉'].map(e=>`<button class="rxn ${mine&&mine.type===e?'mine':''}" onclick="doReact('${m.id}','${e}')">${e} ${counts[e]||''}</button>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div id="commentList">
+        ${topLevel.length===0?`<p class="muted small">No comments yet. Be the first to say something.</p>`:''}
+        ${topLevel.map(c=>commentHtml(c)+repliesOf(c.key.split(':')[2]||'').map(r=>commentHtml(r,true)).join('')).join('')}
+      </div>
+      <form id="commentForm" style="margin-top:14px;display:flex;gap:8px">
+        <input id="commentInput" placeholder="Write a comment..." style="flex:1">
+        <button class="btn btn-primary btn-sm" type="submit">Post</button>
+      </form>
+    </div>
+  </div>`;
+  document.getElementById('commentForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const input = document.getElementById('commentInput');
+    if(!input.value.trim()) return;
+    const label = STATE.guest ? STATE.guest.name+'|guest' : STATE.user.name+'|member';
+    await addComment(m.id, label, STATE.guest?'guest':'member', input.value.trim(), null);
+    input.value='';
+    renderViewer();
+  };
+}
+function commentHtml(c, isReply){
+  const [name, type] = c.authorLabel.split('|');
+  return `<div class="comment ${isReply?'reply':''}">
+    <span class="avatar avatar-sm">${initials(name)}</span>
+    <div class="body">
+      <div class="head">${esc(name)} ${type==='guest'?'<span class="badge badge-guest">Guest</span>':''}</div>
+      <div class="txt">${esc(c.content)}</div>
+      <div class="meta">${timeAgo(c.createdAt)}${!isReply?`<span class="reply-link" onclick="startReply('${c.key.split(':')[2]}')">Reply</span>`:''}</div>
+    </div>
+  </div>`;
+}
+function startReply(commentId){
+  const input = document.getElementById('commentInput');
+  input.focus();
+  document.getElementById('commentForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    if(!input.value.trim()) return;
+    const m = viewerState.list[viewerState.index];
+    const label = STATE.guest ? STATE.guest.name+'|guest' : STATE.user.name+'|member';
+    await addComment(m.id, label, STATE.guest?'guest':'member', input.value.trim(), commentId);
+    input.value='';
+    renderViewer();
+  };
+  toast('Replying — write your reply and press Post');
+}
+async function doReact(mediaId, type){
+  const actorKey = STATE.guest ? 'guest_'+STATE.guest.id : STATE.user.email;
+  await toggleReaction(mediaId, actorKey, type);
+  renderViewer();
+}
+function stepViewer(delta){ viewerState.index += delta; renderViewer(); }
+function closeViewer(){ const el = document.getElementById('viewerRoot'); if(el) el.remove(); render(); }
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('viewerRoot')) return;
+  if(e.key==='ArrowRight') stepViewer(1);
+  if(e.key==='ArrowLeft') stepViewer(-1);
+  if(e.key==='Escape') closeViewer();
+});
+
+// ---------- MEMBERS / ADMIN ----------
+ROUTES.members = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily(); if(!fam){ go('onboarding'); return; }
+  const members = await getFamilyMembers(fam.id);
+  const approved = members.filter(m=>m.status==='approved');
+  const pending = members.filter(m=>m.status==='pending');
+  const admin = isAdmin(fam);
+  app().innerHTML = shell(`
+    <div class="page container">
+      <div class="page-head">
+        <div><h1>Family</h1><p class="muted">${esc(fam.name)} · code <b>${fam.code}</b></p></div>
+        ${admin ? `<button class="btn btn-primary" onclick="openInviteModal()">Invite family member</button>` : ''}
+      </div>
+      ${admin && pending.length>0 ? `
+      <div class="card" style="border-color:var(--gold);margin-bottom:22px">
+        <h3 style="margin:0 0 10px">Pending requests (${pending.length})</h3>
+        <div class="members-list">
+          ${pending.map(m=>`<div class="member-row">
+            <span class="avatar avatar-sm">${initials(m.name)}</span>
+            <div class="member-meta"><div class="mname">${esc(m.name)}</div><div class="msub">${esc(m.email)} ${m.relationship?'· '+esc(m.relationship):''} · requested ${timeAgo(m.joinedAt)}</div></div>
+            <div class="member-actions">
+              <button class="btn btn-sage btn-sm" onclick="approveMember('${fam.id}','${m.email}')">Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="declineMember('${fam.id}','${m.email}')">Decline</button>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+      <div class="card">
+        <h3 style="margin:0 0 10px">Members (${approved.length})</h3>
+        <div class="members-list">
+          ${approved.map(m=>`<div class="member-row">
+            <span class="avatar avatar-sm">${m.avatar?`<img src="${m.avatar}">`:initials(m.name)}</span>
+            <div class="member-meta"><div class="mname">${esc(m.name)} ${m.email===STATE.user.email?'(you)':''}</div><div class="msub">${esc(m.relationship||'—')} · joined ${timeAgo(m.joinedAt)}</div></div>
+            <span class="badge ${m.role==='primary_admin'?'badge-primary':m.role==='admin'?'badge-admin':'badge-pending'}">${roleLabel(m.role)}</span>
+            ${admin && m.role!=='primary_admin' && m.email!==STATE.user.email ? `
+            <div class="member-actions">
+              ${m.role==='member' ? `<button class="btn btn-ghost btn-sm" onclick="promoteMember('${fam.id}','${m.email}')">Make admin</button>` : `<button class="btn btn-ghost btn-sm" onclick="demoteMember('${fam.id}','${m.email}')">Remove admin</button>`}
+              <button class="btn btn-danger btn-sm" onclick="removeMember('${fam.id}','${m.email}')">Remove</button>
+            </div>` : ''}
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `);
+};
+function openInviteModal(){
+  const fam = currentFamily();
+  openModal(`
+    <h2>Invite family</h2>
+    <p class="muted small">Share this code or link with the person you're inviting. They'll submit a request that you approve here.</p>
+    <div class="code-chip">${fam.code} <span style="cursor:pointer" onclick="navigator.clipboard&&navigator.clipboard.writeText('${fam.code}');toast('Code copied')">⧉</span></div>
+    <p class="hint" style="margin-top:14px">They can use this code on the "Join a family" page after creating their own account.</p>
+    <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>
+  `);
+}
+async function approveMember(famId, email){
+  await setMembership(famId, email, {status:'approved'});
+  await notify(email, 'approval', "You're in!", 'Your request to join has been approved.');
+  const fam = await sget('families:'+famId);
+  await logActivity(famId, (await sget('users:'+email)).name+' joined the family.');
+  toast('Member approved','ok'); go('members');
+}
+async function declineMember(famId, email){
+  await removeMembership(famId, email);
+  await notify(email, 'decline', 'Request declined', 'Your request to join was declined by an admin.');
+  toast('Request declined'); go('members');
+}
+async function promoteMember(famId, email){
+  await setMembership(famId, email, {role:'admin'});
+  await notify(email, 'admin_promote', "You're now an Admin", 'You were promoted to Admin.');
+  toast('Promoted to admin','ok'); go('members');
+}
+async function demoteMember(famId, email){
+  await setMembership(famId, email, {role:'member'});
+  toast('Admin role removed'); go('members');
+}
+async function removeMember(famId, email){
+  if(!confirm('Remove this member from the family?')) return;
+  await removeMembership(famId, email);
+  await notify(email, 'member_removed', 'Removed from family', 'You were removed from a family space.');
+  toast('Member removed'); go('members');
+}
+
+// ---------- NOTIFICATIONS ----------
+ROUTES.notifications = async function(){
+  if(!STATE.user){ go('login'); return; }
+  const notifs = await getNotifications(STATE.user.email);
+  app().innerHTML = shell(`
+    <div class="page container" style="max-width:640px">
+      <div class="page-head"><h1>Notifications</h1>${notifs.some(n=>!n.read)?`<button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>`:''}</div>
+      <div class="card">${notifs.length===0?`<p class="muted">No notifications yet.</p>`:notifs.map(notifRow).join('')}</div>
+    </div>
+  `);
+  for(const n of notifs){ if(!n.read){ const r = await sget(n.key); if(r){ r.read=true; await sset(n.key,r);} } }
+};
+async function markAllRead(){ await ROUTES.notifications(); toast('Marked as read'); }
+
+// ---------- TIMELINE ----------
+ROUTES.timeline = async function(){
+  if(!(await requireFamilyContext())) return;
+  const fam = currentFamily(); if(!fam){ go('onboarding'); return; }
+  const media = await getAllMedia(fam.id);
+  const byYear = {};
+  media.forEach(m=>{
+    const d = new Date(m.takenAt);
+    const y = d.getFullYear();
+    byYear[y] = byYear[y] || [];
+    byYear[y].push({m,d});
+  });
+  const years = Object.keys(byYear).sort((a,b)=>b-a);
+  app().innerHTML = shell(`
+    <div class="page container">
+      <h1>Family Timeline</h1>
+      ${years.length===0 ? emptyState('☰','No memories yet','Upload photos to start building your timeline.') :
+      years.map(y=>`
+        <div class="timeline-year">${y}</div>
+        ${byYear[y].sort((a,b)=>b.d-a.d).map(({m,d})=>`
+          <div class="timeline-event">
+            <div class="tmonth">${d.toLocaleString('default',{month:'short'})}</div>
+            <div>${esc(m.caption||(m.type==='video'?'Video':'Photo'))} <span class="small muted">— by ${esc(m.uploadedByName)}</span></div>
+          </div>`).join('')}
+      `).join('')}
+    </div>
+  `);
+};
+
+// ---------- PROFILE ----------
+ROUTES.profile = function(){
+  if(!STATE.user){ go('login'); return; }
+  const u = STATE.user;
+  app().innerHTML = shell(`
+    <div class="page container" style="max-width:520px">
+      <h1>Profile</h1>
+      <div class="card">
+        <div class="avatar avatar-lg" style="margin-bottom:14px">${u.avatar?`<img src="${u.avatar}">`:initials(u.name)}</div>
+        <label>Photo</label><input type="file" id="avatarInput" accept="image/*">
+        <label>Name</label><input id="pName" value="${esc(u.name)}">
+        <label>Email</label><input value="${esc(u.email)}" disabled>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="saveProfile()">Save changes</button>
+        <div class="divider"></div>
+        <button class="btn btn-ghost" onclick="logout()">Log out</button>
+      </div>
+    </div>
+  `);
+  document.getElementById('avatarInput').onchange = async (e)=>{
+    if(!e.target.files[0]) return;
+    STATE.user.avatar = await fileToCompressedDataUrl(e.target.files[0], 300, 0.8);
+  };
+};
+async function saveProfile(){
+  STATE.user.name = document.getElementById('pName').value || STATE.user.name;
+  await sset('users:'+STATE.user.email, STATE.user);
+  toast('Profile updated','ok'); go('dashboard');
+}
+function logout(){ STATE.user=null; STATE.guest=null; STATE.activeFamilyId=null; STATE.families=[]; go('landing'); }
+
+// ---------- MODAL helpers ----------
+function openModal(html){
+  let el = document.getElementById('modalRoot');
+  if(!el){ el = document.createElement('div'); el.id='modalRoot'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>${html}
+  </div></div>`;
+}
+function closeModal(){ const el = document.getElementById('modalRoot'); if(el) el.innerHTML=''; }
+
+// ============================= BOOTSTRAP =============================
+render();
+</script>
+</body>
+</html>

@@ -1536,7 +1536,7 @@ ROUTES.profile = function(){
     if(!e.target.files[0]) return;
     STATE.user.avatar = await fileToCompressedDataUrl(e.target.files[0], 300, 0.8);
   };
-};
+
 async function saveProfile(){
   STATE.user.name = document.getElementById('pName').value || STATE.user.name;
   await sset('users:'+STATE.user.email, STATE.user);
@@ -1555,7 +1555,7 @@ function openModal(html){
 function closeModal(){ const el = document.getElementById('modalRoot'); if(el) el.innerHTML=''; }
 
 // ============================= BOOTSTRAP =============================
-render();)
+render();
 </script> 
   <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"; 

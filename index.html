@@ -847,11 +847,8 @@ ROUTES.login = function(){
       const user = await loginUser(f.get('email'), f.get('password'));
       STATE.user = user;
       await requireFamilyContext();
-      toast('Welcome back, '+user.name.split(' ')[0]+'.', 'ok');
-      go(STATE.families.length ? 'dashboard' : 'onboarding');
-    }catch(err){ toast(err.message, 'err'); }
-  };
-};
+      toast('Verification email sent! Please check your inbox and verify your email before logging in.', 'ok');
+go('login');
 
 ROUTES.onboarding = function(){
   app().innerHTML = shell(`

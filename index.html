@@ -1432,5 +1432,63 @@ function closeModal(){ const el = document.getElementById('modalRoot'); if(el) e
 // ============================= BOOTSTRAP =============================
 render();
 </script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCq2Anlcd0WKEKEcuS1afhCssVX2IlQG0",
+  authDomain: "family-album-dd719.firebaseapp.com",
+  projectId: "family-album-dd719",
+  storageBucket: "family-album-dd719.firebasestorage.app",
+  messagingSenderId: "831332029540",
+  appId: "1:831332029540:web:261b09b61164674aa2bb71"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+window.firebaseAuth = getAuth(firebaseApp);
+window.firebaseDb = getFirestore(firebaseApp);
+
+window.firebaseFunctions = {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  deleteDoc
+};
+</script>
 </body>
 </html>

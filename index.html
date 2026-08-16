@@ -1536,7 +1536,6 @@ ROUTES.profile = function(){
     if(!e.target.files[0]) return;
     STATE.user.avatar = await fileToCompressedDataUrl(e.target.files[0], 300, 0.8);
   };
-
 async function saveProfile(){
   STATE.user.name = document.getElementById('pName').value || STATE.user.name;
   await sset('users:'+STATE.user.email, STATE.user);

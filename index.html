@@ -375,25 +375,24 @@ async function loginUser(email, password) {
   };
 }
 
-async function getUserFamilies(email) {
-  const { collection, getDocs, doc, getDoc } =
-    window.firebaseFunctions;
-
-  const user = window.firebaseAuth.currentUser;
+async function getUserFamilies(email){
+  const { collection, getDocs, doc, getDoc } = window.firebaseFunctions;
+  const db = window.firebaseDb;
+  const user = firebaseAuth.currentUser;
 
   if (!user) return [];
 
   const families = [];
 
   const familiesSnapshot = await getDocs(
-    collection(window.firebaseDb, "families")
+    collection(db, "families")
   );
 
   for (const familyDoc of familiesSnapshot.docs) {
     const family = familyDoc.data();
 
     const memberRef = doc(
-      window.firebaseDb,
+      db,
       "families",
       familyDoc.id,
       "members",
@@ -404,8 +403,8 @@ async function getUserFamilies(email) {
 
     if (memberDoc.exists()) {
       families.push({
-        id: familyDoc.id,
         ...family,
+        id: familyDoc.id,
         membership: memberDoc.data()
       });
     }
@@ -413,7 +412,6 @@ async function getUserFamilies(email) {
 
   return families;
 }
-
 async function createFamily(owner, data) {
   const { collection, addDoc, doc, setDoc } =
     window.firebaseFunctions;

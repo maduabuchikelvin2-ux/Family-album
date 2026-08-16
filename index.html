@@ -375,15 +375,43 @@ async function loginUser(email, password) {
   };
 }
 
-async function getUserFamilies(email){
-  const ids = await sget('userFamilies:'+email) || [];
-  const out = [];
-  for(const fid of ids){
-    const fam = await sget('families:'+fid);
-    const mem = await sget('memberships:'+fid+':'+email);
-    if(fam && mem) out.push({...fam, membership: mem});
+async function getUserFamilies(email) {
+  const { collection, getDocs, doc, getDoc } =
+    window.firebaseFunctions;
+
+  const user = window.firebaseAuth.currentUser;
+
+  if (!user) return [];
+
+  const families = [];
+
+  const familiesSnapshot = await getDocs(
+    collection(window.firebaseDb, "families")
+  );
+
+  for (const familyDoc of familiesSnapshot.docs) {
+    const family = familyDoc.data();
+
+    const memberRef = doc(
+      window.firebaseDb,
+      "families",
+      familyDoc.id,
+      "members",
+      user.uid
+    );
+
+    const memberDoc = await getDoc(memberRef);
+
+    if (memberDoc.exists()) {
+      families.push({
+        id: familyDoc.id,
+        ...family,
+        membership: memberDoc.data()
+      });
+    }
   }
-  return out;
+
+  return families;
 }
 
 async function createFamily(owner, data) {

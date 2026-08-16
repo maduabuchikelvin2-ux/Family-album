@@ -386,22 +386,64 @@ async function getUserFamilies(email){
   return out;
 }
 
-async function createFamily(owner, data){
-  const id = uid('fam');
-  let code;
-  do{ code = famCode(); }while(await sget('famCode:'+code));
-  const fam = {
-    id, name:data.name, description:data.description||'', photo:data.photo||null,
-    location:data.location||'', origin:data.origin||'', foundedYear:data.foundedYear||'',
-    createdBy:owner.email, code, createdAt: Date.now()
+async function createFamily(owner, data) {
+  const { collection, addDoc, doc, setDoc } =
+    window.firebaseFunctions;
+
+  const code = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+
+  // Create the family
+  const familyRef = await addDoc(
+    collection(window.firebaseDb, "families"),
+    {
+      name: data.name,
+      description: data.description || "",
+      photo: data.photo || null,
+      location: data.location || "",
+      origin: data.origin || "",
+      foundedYear: data.foundedYear || "",
+      createdBy: owner.uid,
+      createdByEmail: owner.email,
+      code: code,
+      createdAt: Date.now()
+    }
+  );
+
+  // Create the owner's membership
+  await setDoc(
+    doc(
+      window.firebaseDb,
+      "families",
+      familyRef.id,
+      "members",
+      owner.uid
+    ),
+    {
+      uid: owner.uid,
+      email: owner.email,
+      name: owner.name,
+      role: "primary_admin",
+      relationship: "Me",
+      status: "approved",
+      joinedAt: Date.now()
+    }
+  );
+
+  return {
+    id: familyRef.id,
+    name: data.name,
+    description: data.description || "",
+    photo: data.photo || null,
+    location: data.location || "",
+    origin: data.origin || "",
+    foundedYear: data.foundedYear || "",
+    createdBy: owner.uid,
+    code: code,
+    createdAt: Date.now()
   };
-  await sset('families:'+id, fam);
-  await sset('famCode:'+code, id);
-  await sset('memberships:'+id+':'+owner.email, { role:'primary_admin', relationship:'Me', status:'approved', joinedAt:Date.now() });
-  const list = await sget('userFamilies:'+owner.email) || [];
-  list.push(id);
-  await sset('userFamilies:'+owner.email, list);
-  return fam;
 }
 
 async function requestJoinFamily(user, code, relationship){

@@ -845,8 +845,11 @@ ROUTES.login = function(){
       const user = await loginUser(f.get('email'), f.get('password'));
       STATE.user = user;
       await requireFamilyContext();
-      toast('Verification email sent! Please check your inbox and verify your email before logging in.', 'ok');
-go('login');
+      toast('Welcome back, '+user.name.split(' ')[0]+'!', 'ok');
+      go('dashboard');
+    }catch(err){ toast(err.message, 'err'); }
+  };
+};
 
 ROUTES.onboarding = function(){
   app().innerHTML = shell(`
@@ -1536,6 +1539,7 @@ ROUTES.profile = function(){
     if(!e.target.files[0]) return;
     STATE.user.avatar = await fileToCompressedDataUrl(e.target.files[0], 300, 0.8);
   };
+};
 async function saveProfile(){
   STATE.user.name = document.getElementById('pName').value || STATE.user.name;
   await sset('users:'+STATE.user.email, STATE.user);
